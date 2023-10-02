@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import {BsEyeSlashFill,BsEyeFill} from 'react-icons/bs'
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { ToastContainer, toast } from 'react-toastify';
+import { Link, useNavigate } from 'react-router-dom';
+import Login from '../Login/Login';
 
 const Registration = () => {
     const auth = getAuth();
-
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [fullname, setFullName] = useState('');
     const [password, setPassword] = useState('');
@@ -62,6 +64,9 @@ const Registration = () => {
                     setEmail('');
                     setFullName('');
                     setPassword('');
+                    setTimeout(() => {
+                        navigate('/login')
+                    }, 5000);
                 })
             }).catch((error) =>{
                 if (error.code.includes('auth/email-already-in-use')) {
@@ -114,7 +119,7 @@ const Registration = () => {
                             }
                         </div>
                         <button onClick={handleSubmit} className='w-full md:w-[368px] py-[15px] sm:py-[10px] md:py-5 mt-[31px] sm:mt-[10px] md:mt-[31px] font-nunito text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[86px] cursor-pointer'>Sign up</button>
-                        <p className='w-[354px] sm:w-[368px] font-openSans text-[13px] text-[#03014C] font-normal text-center mt-[35px] sm:mt-[10px] md:mt-[35px]'>Already  have an account ?<a href="" className='font-openSans text-[13px] text-[#EA6C00] font-bold'> Sign In</a></p>
+                        <p className='w-[354px] sm:w-[368px] font-openSans text-[13px] text-[#03014C] font-normal text-center mt-[35px] sm:mt-[10px] md:mt-[35px]'>Already  have an account ?<Link to='/login' className='font-openSans text-[13px] text-[#EA6C00] font-bold'> Sign In</Link></p>
                     </div>
                     <ToastContainer position="top-center" theme="dark" />
                 </div>

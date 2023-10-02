@@ -3,25 +3,23 @@ import loginImg from '../../assets/login-img.png'
 import {BsEyeSlashFill} from 'react-icons/bs'
 import {BsEyeFill} from 'react-icons/bs'
 import {FcGoogle} from 'react-icons/fc'
+import { Link, useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify';
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 const Login = () => {
-
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
-    const [fullname, setFullName] = useState('');
     const [password, setPassword] = useState('');
-
     const [emailerror, setEmailerror] = useState('');
-    const [fullnameerror, setFullNameerror] = useState('');
     const [passworderror, setPassworderror] = useState('');
     const [passwordshow, setPasswordshow] = useState('false');
 
     const handleEmail = (e) => {
         setEmail(e.target.value);
         setEmailerror('');
-    }
-    const handleFullName = (e) => {
-        setFullName(e.target.value);
-        setFullNameerror('');
     }
     const handlePassword = (e) => {
         setPassword(e.target.value);
@@ -35,25 +33,53 @@ const Login = () => {
                 setEmailerror('Invalid email address!');
             }
         }
-        if (!fullname) {
-            setFullNameerror('Enter your full name!');
-        }
         if (!password) {
             setPassworderror('Enter your password!');
-        }else{
-            if (!/^(?=.*[a-z])/.test(password)) {
-                setPassworderror('Your password must contain at least one lowercase letter!'); 
-            }else if (!/^(?=.*[A-Z])/.test(password)) {
-                setPassworderror('Your password must contain at least one uppercase letter!');
-            }else if (!/^(?=.*[0-9])/.test(password)) {
-                setPassworderror('Your password must contain at least one digit!');
-            }else if (!/^(?=.*[!@#$%^&*])/.test(password)) {
-                setPassworderror('Your password must contain at least one symbol!');
-            }else if (!/^(?=.{8,})/.test(password)) {
-                setPassworderror('Your password must be at least 8 characters!');
-            }
+        } 
+            // else{
+            //     if (!/^(?=.*[a-z])/.test(password)) {
+            //         setPassworderror('Your password must contain at least one lowercase letter!'); 
+            //     }else if (!/^(?=.*[A-Z])/.test(password)) {
+            //         setPassworderror('Your password must contain at least one uppercase letter!');
+            //     }else if (!/^(?=.*[0-9])/.test(password)) {
+            //         setPassworderror('Your password must contain at least one digit!');
+            //     }else if (!/^(?=.*[!@#$%^&*])/.test(password)) {
+            //         setPassworderror('Your password must contain at least one symbol!');
+            //     }else if (!/^(?=.{8,})/.test(password)) {
+            //         setPassworderror('Your password must be at least 8 characters!');
+            //     }
+            // }
+        if (email && password && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
+            signInWithEmailAndPassword(auth, email, password)
+                .then(() => {
+                    toast.success('login successful')
+                    setTimeout(() => {
+                        navigate('/')
+                    }, 3000);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    console.log(errorCode);
+                    if (errorCode.includes('auth/invalid-login-credentials')) {
+                        setEmailerror('Email not match!');
+                    }
+                    // if (errorCode.includes('auth/wrong-password')) {
+                    //     setPassworderror('Wrong password!');
+                    // }
+                });
         }
     }
+
+    const handleGoogle = () =>{
+        signInWithPopup(auth, provider)
+            .then(() => {
+                setTimeout(() => {
+                    navigate('/')
+                }, 3000);
+            }).catch((error) => {
+                const errorCode = error.code;
+            });
+                }
 
   return (
     <>
@@ -62,7 +88,7 @@ const Login = () => {
                 <div className='w-1/2 flex justify-end mt-[65px] mb-[75px] mr-[130px] ml-[147px]'>
                     <div className=''>
                         <h1 className='font-openSans text-[34px] text-[#03014C] font-bold mb-[30px]'>Login to your account!</h1>
-                        <div className='w-[235px] flex pt-[23px] pb-[21px] pr-[42px] pl-[30px] border border-[#b7b9ce] rounded-[8.3px] cursor-pointer'>
+                        <div onClick={handleGoogle} className='w-[235px] flex pt-[23px] pb-[21px] pr-[42px] pl-[30px] border border-[#b7b9ce] rounded-[8.3px] cursor-pointer'>
                             <FcGoogle/>
                             <h4 className='font-openSans text-[13px] text-[#03014C] font-semibold tracking-widest ml-[10px]'>Login with Google</h4>
                         </div>
@@ -90,9 +116,11 @@ const Login = () => {
                             }
                         </div>
                         <button onClick={handleSubmit} className='w-[425px] py-5 mt-[55px] font-openSans text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[8.7px] cursor-pointer'>Login to Continue</button>
-                        <p className='w-full font-openSans text-[13px] text-[#03014C] font-normal mt-[35px]'>Don’t have an account ?<a href="" className='font-openSans text-[13px] text-[#EA6C00] font-bold'> Sign up</a></p>
+                        <p className='w-full font-openSans text-[13px] text-[#03014C] font-normal mt-[25px] text-center'>Don’t have an account ?<Link to='/registration' className='font-openSans text-[13px] text-[#EA6C00] font-bold'> Sign up</Link></p>
+                        <p className='w-full font-openSans text-[13px] text-[#03014C] font-normal mt-[20px] text-center'><Link to='/forgotpassword'>Forgot password</Link></p>
                     </div>
                 </div>
+                <ToastContainer position="top-center" theme="dark" />
                 <div className='w-1/2'>
                     <img className='w-full h-screen object-cover' src={loginImg} alt="image" />
                 </div>

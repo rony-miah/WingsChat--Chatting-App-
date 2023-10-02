@@ -7,7 +7,7 @@ function App() {
   return (
     <>
       <Registration></Registration>
-      {/* <Login></Login> */}
+      <Login></Login>
     </>
   )
 }
