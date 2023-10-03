@@ -6,9 +6,11 @@ import {FcGoogle} from 'react-icons/fc'
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useDispatch } from 'react-redux'
 
 const Login = () => {
     const auth = getAuth();
+    const dispatch = useDispatch();
     const provider = new GoogleAuthProvider();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -51,18 +53,20 @@ const Login = () => {
             // }
         if (email && password && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
             signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
+                .then((user) => {
+                    console.log(user.user);
                     toast.success('login successful')
+                    // dispatch(userLoginInfo(user.user))
                     setTimeout(() => {
                         navigate('/')
                     }, 3000);
                 })
                 .catch((error) => {
                     const errorCode = error.code;
-                    console.log(errorCode);
-                    if (errorCode.includes('auth/invalid-login-credentials')) {
-                        setEmailerror('Email not match!');
-                    }
+                    // console.log(errorCode);
+                    // if (errorCode.includes('auth/invalid-login-credentials')) {
+                    //     setEmailerror('Email not match!');
+                    // }
                     // if (errorCode.includes('auth/wrong-password')) {
                     //     setPassworderror('Wrong password!');
                     // }
