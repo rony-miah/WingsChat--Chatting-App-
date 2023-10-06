@@ -56,7 +56,7 @@ const Login = () => {
                 .then((user) => {
                     console.log(user.user);
                     toast.success('login successful')
-                    // dispatch(userLoginInfo(user.user))
+                    dispatch(userLoginInfo(user.user))
                     setTimeout(() => {
                         navigate('/')
                     }, 3000);
