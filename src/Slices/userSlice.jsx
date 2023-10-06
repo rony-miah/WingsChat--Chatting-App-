@@ -9,7 +9,6 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     userLoginInfo: (state,action) => {
-      // console.log(state);
       state.userInfo = action.payload
 
     },

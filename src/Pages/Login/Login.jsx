@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useDispatch } from 'react-redux'
+import { userLoginInfo } from '../../Slices/userSlice'
 
 const Login = () => {
     const auth = getAuth();
