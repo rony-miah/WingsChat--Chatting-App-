@@ -57,10 +57,11 @@ const Login = () => {
                 .then((user) => {
                     console.log(user.user);
                     toast.success('login successful')
-                    dispatch(userLoginInfo(user.user))
+                    dispatch(userLoginInfo(user))
+                    localStorage.setItem('userLoginInfo', JSON.stringify((user)))
                     setTimeout(() => {
                         navigate('/')
-                    }, 3000);
+                    }, 2000);
                 })
                 .catch((error) => {
                     const errorCode = error.code;
@@ -80,7 +81,7 @@ const Login = () => {
             .then(() => {
                 setTimeout(() => {
                     navigate('/')
-                }, 3000);
+                }, 2000);
             }).catch((error) => {
                 const errorCode = error.code;
             });
