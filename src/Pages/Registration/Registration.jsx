@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import {BsEyeSlashFill,BsEyeFill} from 'react-icons/bs'
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { ToastContainer, toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import Login from '../Login/Login';
+import { CirclesWithBar } from  'react-loader-spinner'
 
 const Registration = () => {
     const auth = getAuth();
@@ -16,7 +17,8 @@ const Registration = () => {
     const [emailerror, setEmailerror] = useState('');
     const [fullnameerror, setFullNameerror] = useState('');
     const [passworderror, setPassworderror] = useState('');
-    const [passwordshow, setPasswordshow] = useState('false');
+    const [passwordshow, setPasswordshow] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleEmail = (e) => {
         setEmail(e.target.value);
@@ -58,16 +60,27 @@ const Registration = () => {
         //     }
         // }
         if (email && fullname && password && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))) {
-            createUserWithEmailAndPassword(auth, email, password) .then(() =>{
-                sendEmailVerification(auth.currentUser) .then(()=>{
+            setLoading(true)
+            createUserWithEmailAndPassword(auth, email, password) .then((user) =>{
+                updateProfile(auth.currentUser, {
+                    displayName: fullname, 
+                    photoURL: "https://example.com/jane-q-user/profile.jpg"
+                  })
+                  .then(() => {
                     toast.success('Registration complete! Please verify your email');
+                    console.log(user, 'user'); 
                     setEmail('');
                     setFullName('');
                     setPassword('');
+                    setLoading(true)
+                    sendEmailVerification(auth.currentUser)
                     setTimeout(() => {
                         navigate('/login')
-                    }, 5000);
-                })
+                    }, 3000);
+                  }).catch((error) => {
+                    // An error occurred
+                    // ...
+                  });
             }).catch((error) =>{
                 if (error.code.includes('auth/email-already-in-use')) {
                     setEmailerror('Already in use');
@@ -105,7 +118,7 @@ const Registration = () => {
                                 <p className='w-1/2 font-nunito text-[13px] text-center text-white font-semibold rounded-md bg-red-500 p-1 mt-1'>{fullnameerror}</p>
                             }
                         </div>
-                        <div className='relative mt-[39px] sm:mt-4 md:mt-[39px]'>
+                        <div className='relative mt-[39px] sm:mt-4 md:mt-[39px] mb-2'>
                             <input onChange={handlePassword} value={password} className='w-full md:w-[368px] py-[20px] sm:py-[10px] md:py-[20px] pl-[35px] sm:pl-[52px] pr-[35px] sm:pr-[65px] border border-[#b7b9ce] rounded-[8.6px] focus:outline-none sm:text-sm md:text-base' type={!passwordshow ? 'text' : 'password'} placeholder='Password' />
                             <p className='absolute top-[-9px] left-[30px] sm:left-[46px] px-[6px] sm:px-[6px] bg-white font-nunito text-[13px] text-[#585d8e] tracking-widest font-semibold'>Password</p>
                             {
@@ -118,7 +131,24 @@ const Registration = () => {
                                 <p className='w-[368px] font-nunito text-[13px] text-white font-semibold rounded-md bg-red-500 p-1 mt-1'>{passworderror}</p>
                             }
                         </div>
-                        <button onClick={handleSubmit} className='w-full md:w-[368px] py-[15px] sm:py-[10px] md:py-5 mt-[31px] sm:mt-[10px] md:mt-[31px] font-nunito text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[86px] cursor-pointer'>Sign up</button>
+                        {
+                            loading ?
+                            <CirclesWithBar
+                            height="50"
+                            width="50"
+                            color="#4fa94d"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                            visible={true}
+                            outerCircleColor=""
+                            innerCircleColor=""
+                            barColor=""
+                            ariaLabel='circles-with-bar-loading'
+                            />
+                            :
+                            <button onClick={handleSubmit} className='w-full md:w-[368px] py-[15px] sm:py-[10px] md:py-5 mt-[31px] sm:mt-[10px] md:mt-[31px] font-nunito text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[86px] cursor-pointer'>Sign up</button>
+                        }
+
                         <p className='w-[354px] sm:w-[368px] font-openSans text-[13px] text-[#03014C] font-normal text-center mt-[35px] sm:mt-[10px] md:mt-[35px]'>Already  have an account ?<Link to='/login' className='font-openSans text-[13px] text-[#EA6C00] font-bold'> Sign In</Link></p>
                     </div>
                     <ToastContainer position="top-center" theme="dark" />
