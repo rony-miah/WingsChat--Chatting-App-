@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../Components/Sidebar/Sidebar';
 import Search from '../../Components/Search/Search';
@@ -9,19 +9,33 @@ import Friends from '../../Components/Friends/Friends';
 import MyGroups from '../../Components/MyGroups/MyGroups';
 import UserList from '../../Components/UserList/UserList';
 import BlockedUsers from '../../Components/BlockedUsers/BlockedUsers';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { userLoginInfo } from '../../Slices/userSlice';
+
 
 const Home = () => {
+  const auth = getAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const data = useSelector(state => state.userLoginInfo.userInfo);
   console.log(data);
 
-  // const [verify, setVerify] = useState(false);
+  const [verify, setVerify] = useState(false);
 
   useEffect(()=>{
     if (!data) {
       navigate('/login')
     }
   })
+
+  onAuthStateChanged (auth, (user)=>{
+    if (user.emailVerified) {
+      dispatch(userLoginInfo(user))
+      localStorage.setItem('userLoginInfo', JSON.stringify((user)))
+      setVerify(true)
+    }
+  })
+
   return (
     <>
       <div className='flex gap-x-[100px] mt-[35px]'>

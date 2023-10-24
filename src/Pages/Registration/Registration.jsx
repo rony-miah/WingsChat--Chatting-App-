@@ -64,7 +64,7 @@ const Registration = () => {
             createUserWithEmailAndPassword(auth, email, password) .then((user) =>{
                 updateProfile(auth.currentUser, {
                     displayName: fullname, 
-                    photoURL: "https://example.com/jane-q-user/profile.jpg"
+                    photoURL: "./src/assets/profilepic.png"
                   })
                   .then(() => {
                     toast.success('Registration complete! Please verify your email');

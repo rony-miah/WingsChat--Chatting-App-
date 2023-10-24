@@ -5,18 +5,24 @@ import {IoMdNotificationsOutline} from 'react-icons/io'
 import {FaCloudUploadAlt} from 'react-icons/fa'
 import {SlSettings} from 'react-icons/sl'
 import {TbLogout} from 'react-icons/tb'
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, updateProfile } from "firebase/auth";
 import { useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { userLoginInfo } from '../../Slices/userSlice'
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
+import { getDownloadURL, getStorage, ref, uploadString } from "firebase/storage";
+import { CirclesWithBar } from 'react-loader-spinner'
 
 const Sidebar = () => {
     const auth = getAuth();
+    const storage = getStorage();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const data = useSelector(state => state.userLoginInfo.userInfo.user);
+    console.log(data, 'data');
 
+    const [loading, setLoading] = useState(false);
     const [profileImgUploadModal, setProfileImgUploadModal] = useState(false);
 
     const [image, setImage] = useState('');
@@ -38,6 +44,8 @@ const Sidebar = () => {
     }
     const handleProfileImgUploadCancel = () => {
         setProfileImgUploadModal(false)
+        // setImage('');
+        // setCropData('')
     }
 
     const handleProfileImgChange = (e) => {
@@ -56,11 +64,38 @@ const Sidebar = () => {
         reader.readAsDataURL(files[0]);
     }
 
+    const getCropData = () =>{
+        if (typeof cropperRef.current?.cropper !=="undefined") {
+            setLoading(true)
+            setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
+
+
+            const storageRef = ref(storage, auth.currentUser.uid);
+            const message4 = cropperRef.current?.cropper.getCroppedCanvas().toDataURL();
+            uploadString(storageRef, message4, 'data_url').then((snapshot) => {
+            console.log('Uploaded a data_url string!');
+
+            getDownloadURL(storageRef).then((downloadURL) => {
+                console.log('File available at', downloadURL);
+                updateProfile(auth.currentUser, { 
+                    photoURL: downloadURL
+                  })
+                  .then(()=>{
+                    setProfileImgUploadModal(false);
+                    setImage('');
+                    setCropData('')
+                  })
+                  setLoading(true)
+              });
+            });
+        }
+    }
+
   return (
     <>
         <div className='bg-[#5F35F5] h-screen rounded-[20px] pt-[38px]'>
             <div className='group relative w-[100px] h-[100px] mx-auto'>
-                <img src={profilepic} alt="" className='mx-auto'/>
+                <img src={data} alt="" className='mx-auto rounded-full'/>
                 <div className='absolute w-full h-full top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:bg-[#00000069] rounded-full cursor-pointer flex justify-center items-center'>
                     <FaCloudUploadAlt onClick={handleProfileImgUpload} className='w-[25px] h-[18px] text-[#EBEAEA]'/>
                 </div>
@@ -92,7 +127,7 @@ const Sidebar = () => {
                                     style={{ width: "100%", float: "left", height: "300px" }}
                                 />
                                 :
-                                <img src={profilepic} alt="" className='mx-auto w-full h-full'/>
+                                <img src={data} alt="" className='mx-auto w-full h-full'/>
                             }    
                         </div>
                         
@@ -118,7 +153,23 @@ const Sidebar = () => {
                         }
                         
                         <div className='mt-[55px]'>
-                            <button className='p-5 mr-5 font-openSans text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[8px] cursor-pointer'>Upload</button>
+                        {
+                            loading ?
+                            <CirclesWithBar
+                            height="50"
+                            width="50"
+                            color="#4fa94d"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                            visible={true}
+                            outerCircleColor=""
+                            innerCircleColor=""
+                            barColor=""
+                            ariaLabel='circles-with-bar-loading'
+                            />
+                            :
+                            <button onClick={getCropData} className='p-5 mr-5 font-openSans text-xl text-white font-semibold text-center bg-[#5F35F5] rounded-[8px] cursor-pointer'>Upload</button>
+                        }
                             <button onClick={handleProfileImgUploadCancel} className='p-5 font-openSans text-xl text-white font-semibold text-center bg-red-700 rounded-[8px] cursor-pointer'>Cancel</button>
                         </div>
                     </div>
