@@ -5,9 +5,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import Login from '../Login/Login';
 import { CirclesWithBar } from  'react-loader-spinner'
+import { getDatabase, ref, set } from "firebase/database";
 
 const Registration = () => {
     const auth = getAuth();
+    const db = getDatabase();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [fullname, setFullName] = useState('');
@@ -77,9 +79,14 @@ const Registration = () => {
                     setTimeout(() => {
                         navigate('/login')
                     }, 3000);
-                  }).catch((error) => {
-                    // An error occurred
-                    // ...
+                  }).then(() => {
+                    set(ref(db, 'users/' + user.user.uid), {
+                        username: user.user.displayName,
+                        email: user.user.email
+                    });
+                  })
+                  .catch((error) => {
+                    console.log(error.code);
                   });
             }).catch((error) =>{
                 if (error.code.includes('auth/email-already-in-use')) {

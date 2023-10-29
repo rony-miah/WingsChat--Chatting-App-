@@ -19,7 +19,7 @@ const Sidebar = () => {
     const storage = getStorage();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const data = useSelector(state => state.userLoginInfo.userInfo.user.photoURL);
+    const data = useSelector(state => state.userLoginInfo.userInfo);
     console.log(data, 'data');
 
     const [loading, setLoading] = useState(false);
@@ -72,7 +72,6 @@ const Sidebar = () => {
             const message4 = cropperRef.current?.cropper.getCroppedCanvas().toDataURL();
             uploadString(storageRef, message4, 'data_url').then((snapshot) => {
             console.log('Uploaded a data_url string!');
-            
             getDownloadURL(storageRef).then((downloadURL) => {
                 console.log('File available at', downloadURL);
                 updateProfile(auth.currentUser, { 
@@ -94,12 +93,13 @@ const Sidebar = () => {
     <>
         <div className='bg-[#5F35F5] h-screen rounded-[20px] pt-[38px]'>
             <div className='group relative w-[100px] h-[100px] mx-auto'>
-                <img src={data} alt="img" className='mx-auto rounded-full'/>
+                <img src={data.photoURL} alt="img" className='mx-auto rounded-full'/>
                 <div className='absolute w-full h-full top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:bg-[#00000069] rounded-full cursor-pointer flex justify-center items-center'>
                     <FaCloudUploadAlt onClick={handleProfileImgUpload} className='w-[25px] h-[18px] text-[#EBEAEA]'/>
                 </div>
             </div>
-            <div className='relative flex justify-center pt-[20px] pb-[25px] mt-[78px] after:absolute after:content-[""] after:top-0 after:right-0 after:w-[160px] after:h-full after:bg-white after:z-[-1] after:rounded-l-[20px] z-[1] before:absolute before:content-[""] before:top-0 before:right-0 before:w-[8px] before:h-full before:bg-[#5F35F5] before:rounded-l-[20px]'>
+            <h2 className='font-poppins text-[25px] text-white text-center font-semibold mt-3'>{data.displayName}</h2>
+            <div className='relative flex justify-center pt-[20px] pb-[25px] mt-[25px] after:absolute after:content-[""] after:top-0 after:right-0 after:w-[160px] after:h-full after:bg-white after:z-[-1] after:rounded-l-[20px] z-[1] before:absolute before:content-[""] before:top-0 before:right-0 before:w-[8px] before:h-full before:bg-[#5F35F5] before:rounded-l-[20px]'>
                 <AiOutlineHome className='text-5xl text-[#5F35F5] cursor-pointer'/>
             </div>
             <div className='flex justify-center mt-[78px]'>
@@ -126,7 +126,7 @@ const Sidebar = () => {
                                     style={{ width: "100%", float: "left", height: "300px" }}
                                 />
                                 :
-                                <img src={profilepic} alt="" className='mx-auto w-full h-full'/>
+                                <img src={data.photoURL} alt="" className='mx-auto w-full h-full'/>
                             }    
                         </div>
                         
