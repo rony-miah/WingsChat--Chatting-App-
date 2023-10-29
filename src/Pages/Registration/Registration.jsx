@@ -17,7 +17,7 @@ const Registration = () => {
     const [emailerror, setEmailerror] = useState('');
     const [fullnameerror, setFullNameerror] = useState('');
     const [passworderror, setPassworderror] = useState('');
-    const [passwordshow, setPasswordshow] = useState(false);
+    const [passwordshow, setPasswordshow] = useState(true);
     const [loading, setLoading] = useState(false);
 
     const handleEmail = (e) => {
@@ -122,7 +122,8 @@ const Registration = () => {
                             <input onChange={handlePassword} value={password} className='w-full md:w-[368px] py-[20px] sm:py-[10px] md:py-[20px] pl-[35px] sm:pl-[52px] pr-[35px] sm:pr-[65px] border border-[#b7b9ce] rounded-[8.6px] focus:outline-none sm:text-sm md:text-base' type={!passwordshow ? 'text' : 'password'} placeholder='Password' />
                             <p className='absolute top-[-9px] left-[30px] sm:left-[46px] px-[6px] sm:px-[6px] bg-white font-nunito text-[13px] text-[#585d8e] tracking-widest font-semibold'>Password</p>
                             {
-                                passwordshow ? <BsEyeSlashFill onClick={()=> setPasswordshow(!passwordshow)} className='absolute top-6 left-[335px] cursor-pointer'/>
+                                passwordshow ?
+                                <BsEyeSlashFill onClick={()=> setPasswordshow(!passwordshow)} className='absolute top-6 left-[335px] cursor-pointer'/>
                                 :
                                 <BsEyeFill onClick={()=> setPasswordshow(!passwordshow)} className='absolute top-6 left-[335px] cursor-pointer'/>
                             }
